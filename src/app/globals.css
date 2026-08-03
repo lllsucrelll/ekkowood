@@ -3,6 +3,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /*
+   * Charte graphique provisoire Ekko Wood.
+   * A remplacer par les vraies valeurs (logo, couleurs, typo) une fois
+   * fournies — ce sont les seules variables à changer, tout le reste
+   * de l'app (page publique + dashboard) les référence via @theme.
+   */
+  --brand-primary: #6b4a33; /* bois / brun chaud */
+  --brand-primary-dark: #4a3323;
+  --brand-accent: #4c7a5a; /* vert sauge, touche éco */
+  --brand-bg: #faf6f0; /* fond chaud, papier/bois clair */
+  --brand-text: #2a211c;
+  --brand-font-sans: var(--font-geist-sans);
 }
 
 @theme inline {
@@ -10,17 +23,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-dark: var(--brand-primary-dark);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-bg: var(--brand-bg);
+  --color-brand-text: var(--brand-text);
+  --font-brand: var(--brand-font-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}

@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- Admin (back-office Ekko Wood) ---
+// Entièrement séparé des commerçants : table, sessions et cookies distincts,
+// pour qu'un compte commerçant compromis ne puisse jamais atteindre l'admin.
+
+model AdminUser {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime?
+  createdAt        DateTime  @default(now())
+
+  sessions AdminSession[]
+}
+
+model AdminSession {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  adminUserId String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([adminUserId])
+}
+
+// --- Commerçant ---
+
+enum MerchantStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+model Merchant {
+  id               String         @id @default(cuid())
+  // Slug figé, choisi par l'admin à la création : il est gravé sur le
+  // QR code / la puce NFC du présentoir, le commerçant ne peut pas le changer.
+  slug             String         @unique
+  email            String         @unique
+  passwordHash     String
+  businessName     String
+  status           MerchantStatus @default(ACTIVE)
+  accessExpiresAt  DateTime
+  failedLoginCount Int            @default(0)
+  lockedUntil      DateTime?
+
+  // Version en cours d'édition, jamais affichée publiquement.
+  draftConfig     Json @default("{\"banner\":null,\"buttons\":[]}")
+  // Version affichée sur la page publique ; null tant que le commerçant
+  // n'a jamais cliqué sur "Publier".
+  publishedConfig Json?
+
+  createdAt DateTime @default(now())
+
+  sessions     MerchantSession[]
+  resetTokens  PasswordResetToken[]
+  visits       Visit[]
+  buttonClicks ButtonClick[]
+}
+
+model MerchantSession {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  merchantId String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([merchantId])
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  merchantId String
+  expiresAt  DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([merchantId])
+}
+
+// --- Statistiques ---
+// Volontairement sans IP ni identifiant visiteur (RGPD) : uniquement
+// des compteurs agrégeables par date.
+
+model Visit {
+  id         String   @id @default(cuid())
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  merchantId String
+  createdAt  DateTime @default(now())
+
+  @@index([merchantId, createdAt])
+}
+
+model ButtonClick {
+  id          String   @id @default(cuid())
+  merchant    Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  merchantId  String
+  buttonId    String
+  // Libellé et type figés au moment du clic, pour garder un historique
+  // lisible même si le bouton est ensuite modifié ou supprimé.
+  buttonLabel String
+  buttonType  String
+  createdAt   DateTime @default(now())
+
+  @@index([merchantId, createdAt])
+}
