@@ -9,15 +9,19 @@ export function PublicButton({
   buttonType,
   label,
   href,
+  preview = false,
 }: {
   merchantId: string;
   buttonId: string;
   buttonType: string;
   label: string;
   href: string;
+  /** Skips click tracking — used when rendering the merchant's own draft preview. */
+  preview?: boolean;
 }) {
   const Icon = getButtonIcon(buttonType);
   function trackClick() {
+    if (preview) return;
     const payload = JSON.stringify({
       merchantId,
       buttonId,
