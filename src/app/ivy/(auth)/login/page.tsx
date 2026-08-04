@@ -1,7 +1,14 @@
+import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/LoginForm";
 import { adminLoginAction } from "@/lib/actions/admin-auth";
+import { getAdminSession } from "@/lib/auth/admin";
 
-export default function AdminLoginPage() {
+export default async function AdminLoginPage() {
+  const admin = await getAdminSession();
+  if (admin) {
+    redirect("/ivy");
+  }
+
   return (
     <main className="flex flex-1 flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm">

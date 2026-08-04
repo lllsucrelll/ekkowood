@@ -1,8 +1,15 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/LoginForm";
 import { merchantLoginAction } from "@/lib/actions/merchant-auth";
+import { getMerchantSession } from "@/lib/auth/merchant";
 
-export default function MerchantLoginPage() {
+export default async function MerchantLoginPage() {
+  const merchant = await getMerchantSession();
+  if (merchant) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="flex flex-1 flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm">

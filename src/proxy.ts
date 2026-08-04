@@ -17,11 +17,13 @@ export function proxy(request: NextRequest) {
       pathname.startsWith("/dashboard/reset-password");
     const hasSession = request.cookies.has(MERCHANT_SESSION_COOKIE);
 
+    // Redirecting away from the login page when a cookie is merely present
+    // (without checking the database) risks a redirect loop if the cookie
+    // is stale — the DB-backed check in the layout would bounce back to
+    // login, which this proxy would then bounce away from again. Login
+    // pages check the real session themselves instead (see their page.tsx).
     if (!isAuthPage && !hasSession) {
       return NextResponse.redirect(new URL("/dashboard/login", request.url));
-    }
-    if (isAuthPage && hasSession && pathname === "/dashboard/login") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
 
@@ -31,9 +33,6 @@ export function proxy(request: NextRequest) {
 
     if (!isAuthPage && !hasSession) {
       return NextResponse.redirect(new URL("/ivy/login", request.url));
-    }
-    if (isAuthPage && hasSession) {
-      return NextResponse.redirect(new URL("/ivy", request.url));
     }
   }
 
