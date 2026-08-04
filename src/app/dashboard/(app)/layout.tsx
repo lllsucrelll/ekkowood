@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getMerchantSession } from "@/lib/auth/merchant";
 import { merchantLogoutAction } from "@/lib/actions/merchant-auth";
+import { DashboardNav } from "./DashboardNav";
 
 export default async function DashboardLayout({
   children,
@@ -18,20 +18,7 @@ export default async function DashboardLayout({
       <header className="flex flex-col gap-3 border-b border-black/10 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
           <p className="text-sm text-brand-text/60">{merchant.businessName}</p>
-          <nav className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium">
-            <Link href="/dashboard" className="hover:text-brand-primary">
-              Configuration
-            </Link>
-            <Link href="/dashboard/stats" className="hover:text-brand-primary">
-              Statistiques
-            </Link>
-            <Link href="/dashboard/reports" className="hover:text-brand-primary">
-              Retours
-            </Link>
-            <Link href="/dashboard/settings" className="hover:text-brand-primary">
-              Paramètres
-            </Link>
-          </nav>
+          <DashboardNav />
         </div>
         <form action={merchantLogoutAction}>
           <button
