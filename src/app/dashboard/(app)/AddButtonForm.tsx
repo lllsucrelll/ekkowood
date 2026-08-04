@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useActionState } from "react";
 import { addButtonAction } from "@/lib/actions/merchant-page";
-import { PREDEFINED_BUTTON_TYPES } from "@/lib/button-types";
+import { PREDEFINED_BUTTON_TYPES, isInternalButtonType } from "@/lib/button-types";
 
 export function AddButtonForm() {
   const [state, formAction, isPending] = useActionState(addButtonAction, {});
+  const [type, setType] = useState("custom");
+  const internal = isInternalButtonType(type);
 
   return (
     <form
@@ -19,7 +22,8 @@ export function AddButtonForm() {
         <select
           id="type"
           name="type"
-          defaultValue="custom"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
           className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
         >
           {Object.entries(PREDEFINED_BUTTON_TYPES).map(([key, def]) => (
@@ -49,8 +53,10 @@ export function AddButtonForm() {
         <input
           id="url"
           name="url"
-          required
-          className="rounded-lg border border-black/10 px-3 py-2 text-sm"
+          required={!internal}
+          disabled={internal}
+          placeholder={internal ? "Non nécessaire pour ce type" : undefined}
+          className="rounded-lg border border-black/10 px-3 py-2 text-sm disabled:bg-black/5 disabled:text-brand-text/40"
         />
       </div>
 

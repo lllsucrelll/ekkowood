@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { parsePageConfig, sortedButtons } from "@/lib/page-config";
-import { getButtonHref } from "@/lib/button-types";
+import { getButtonHref, isInternalButtonType } from "@/lib/button-types";
+import { isMerchantPubliclyAvailable } from "@/lib/merchant-public";
 import { PublicButton } from "@/components/PublicButton";
 
 export const dynamic = "force-dynamic";
@@ -18,12 +19,7 @@ export default async function PublicMerchantPage({
     notFound();
   }
 
-  const isAvailable =
-    merchant.status === "ACTIVE" &&
-    merchant.accessExpiresAt > new Date() &&
-    merchant.publishedConfig !== null;
-
-  if (!isAvailable) {
+  if (!isMerchantPubliclyAvailable(merchant)) {
     return (
       <main className="flex flex-1 flex-col items-center justify-center p-8 text-center">
         <p className="text-brand-text/70">
@@ -66,7 +62,11 @@ export default async function PublicMerchantPage({
               buttonId={button.id}
               buttonType={button.type}
               label={button.label}
-              href={getButtonHref(button.type, button.url)}
+              href={
+                isInternalButtonType(button.type)
+                  ? `/${merchant.slug}/report`
+                  : getButtonHref(button.type, button.url)
+              }
             />
           ))}
         </div>

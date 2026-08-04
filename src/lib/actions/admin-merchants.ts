@@ -135,6 +135,33 @@ export async function updateAccessExpiryAction(
   revalidatePath("/ivy");
 }
 
+const resetPasswordSchema = z.object({
+  merchantId: z.string().min(1),
+  newPassword: z.string().min(8),
+});
+
+export async function adminResetMerchantPasswordAction(
+  formData: FormData
+): Promise<void> {
+  const admin = await getAdminSession();
+  if (!admin) return;
+
+  const parsed = resetPasswordSchema.safeParse({
+    merchantId: formData.get("merchantId"),
+    newPassword: formData.get("newPassword"),
+  });
+  if (!parsed.success) return;
+
+  const passwordHash = await hashPassword(parsed.data.newPassword);
+  await prisma.merchant.update({
+    where: { id: parsed.data.merchantId },
+    data: { passwordHash },
+  });
+  await invalidateAllMerchantSessions(parsed.data.merchantId);
+
+  revalidatePath("/ivy");
+}
+
 function isUniqueConstraintError(error: unknown, field: string): boolean {
   return (
     typeof error === "object" &&

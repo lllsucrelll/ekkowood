@@ -66,3 +66,19 @@ export async function invalidateAllMerchantSessions(
 ): Promise<void> {
   await prisma.merchantSession.deleteMany({ where: { merchantId } });
 }
+
+/**
+ * After a self-service password change, log out every other device/session
+ * but keep the one making the change signed in.
+ */
+export async function invalidateOtherMerchantSessions(
+  merchantId: string
+): Promise<void> {
+  const cookieStore = await cookies();
+  const currentToken = cookieStore.get(MERCHANT_SESSION_COOKIE)?.value;
+  if (!currentToken) return;
+
+  await prisma.merchantSession.deleteMany({
+    where: { merchantId, token: { not: currentToken } },
+  });
+}

@@ -25,6 +25,12 @@ export default async function DashboardLayout({
             <Link href="/dashboard/stats" className="hover:text-brand-primary">
               Statistiques
             </Link>
+            <Link href="/dashboard/reports" className="hover:text-brand-primary">
+              Retours
+            </Link>
+            <Link href="/dashboard/settings" className="hover:text-brand-primary">
+              Paramètres
+            </Link>
           </nav>
         </div>
         <form action={merchantLogoutAction}>

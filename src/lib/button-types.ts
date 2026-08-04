@@ -23,7 +23,14 @@ export type ButtonType = PredefinedButtonType | "custom";
 
 export const PREDEFINED_BUTTON_TYPES: Record<
   PredefinedButtonType,
-  { label: string; icon: IconType; urlPlaceholder: string; isPhone?: boolean }
+  {
+    label: string;
+    icon: IconType;
+    urlPlaceholder: string;
+    isPhone?: boolean;
+    /** Mène vers une page interne (ex: formulaire de signalement) plutôt que vers un lien fourni par le commerçant. */
+    isInternal?: boolean;
+  }
 > = {
   facebook: {
     label: "Facebook",
@@ -48,7 +55,8 @@ export const PREDEFINED_BUTTON_TYPES: Record<
   report_issue: {
     label: "Signaler un problème",
     icon: FaTriangleExclamation,
-    urlPlaceholder: "https://... ou mailto:contact@...",
+    urlPlaceholder: "(non utilisé — mène vers un formulaire automatique)",
+    isInternal: true,
   },
   website: {
     label: "Site web",
@@ -69,6 +77,10 @@ export function isPredefinedButtonType(
   type: string
 ): type is PredefinedButtonType {
   return Object.prototype.hasOwnProperty.call(PREDEFINED_BUTTON_TYPES, type);
+}
+
+export function isInternalButtonType(type: string): boolean {
+  return isPredefinedButtonType(type) && !!PREDEFINED_BUTTON_TYPES[type].isInternal;
 }
 
 export function getButtonIcon(type: string): IconType {

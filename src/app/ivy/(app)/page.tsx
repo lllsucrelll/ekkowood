@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import {
   toggleMerchantStatusAction,
   updateAccessExpiryAction,
+  adminResetMerchantPasswordAction,
 } from "@/lib/actions/admin-merchants";
 import { CreateMerchantForm } from "./CreateMerchantForm";
 
@@ -33,6 +34,7 @@ export default async function BackofficeHomePage() {
                   <th className="py-2 pr-4">Email</th>
                   <th className="py-2 pr-4">Statut</th>
                   <th className="py-2 pr-4">Expiration</th>
+                  <th className="py-2 pr-4">Mot de passe</th>
                   <th className="py-2 pr-4">Actions</th>
                 </tr>
               </thead>
@@ -88,6 +90,32 @@ export default async function BackofficeHomePage() {
                             className="text-xs text-brand-primary hover:underline"
                           >
                             Mettre à jour
+                          </button>
+                        </form>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <form
+                          action={adminResetMerchantPasswordAction}
+                          className="flex items-center gap-2"
+                        >
+                          <input
+                            type="hidden"
+                            name="merchantId"
+                            value={merchant.id}
+                          />
+                          <input
+                            type="password"
+                            name="newPassword"
+                            placeholder="Nouveau mot de passe"
+                            minLength={8}
+                            required
+                            className="w-36 rounded-lg border border-black/10 px-2 py-1 text-xs"
+                          />
+                          <button
+                            type="submit"
+                            className="text-xs text-brand-primary hover:underline"
+                          >
+                            Réinitialiser
                           </button>
                         </form>
                       </td>

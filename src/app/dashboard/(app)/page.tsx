@@ -1,6 +1,6 @@
 import { getMerchantSession } from "@/lib/auth/merchant";
 import { parsePageConfig, sortedButtons } from "@/lib/page-config";
-import { getButtonIcon } from "@/lib/button-types";
+import { getButtonIcon, isInternalButtonType } from "@/lib/button-types";
 import {
   deleteButtonAction,
   moveButtonAction,
@@ -33,6 +33,7 @@ export default async function DashboardConfigPage() {
         <div className="flex flex-col gap-3">
           {buttons.map((button, index) => {
             const Icon = getButtonIcon(button.type);
+            const internal = isInternalButtonType(button.type);
             return (
               <div
                 key={button.id}
@@ -53,7 +54,9 @@ export default async function DashboardConfigPage() {
                   <input
                     name="url"
                     defaultValue={button.url}
-                    className="flex-1 rounded-lg border border-black/10 px-3 py-1.5 text-sm"
+                    disabled={internal}
+                    placeholder={internal ? "Non nécessaire pour ce type" : undefined}
+                    className="flex-1 rounded-lg border border-black/10 px-3 py-1.5 text-sm disabled:bg-black/5 disabled:text-brand-text/40"
                   />
                   <button
                     type="submit"

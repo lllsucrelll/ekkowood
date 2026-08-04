@@ -11,6 +11,7 @@ import { parsePageConfig, sortedButtons, type PageConfig } from "@/lib/page-conf
 import {
   isPredefinedButtonType,
   getButtonDefaultLabel,
+  isInternalButtonType,
 } from "@/lib/button-types";
 import type { ActionState } from "./merchant-auth";
 
@@ -53,7 +54,7 @@ export async function uploadBannerAction(
 const addButtonSchema = z.object({
   type: z.string().min(1),
   label: z.string().optional(),
-  url: z.string().min(1, "Le lien est requis."),
+  url: z.string().optional(),
 });
 
 export async function addButtonAction(
@@ -64,12 +65,18 @@ export async function addButtonAction(
   const parsed = addButtonSchema.safeParse({
     type: formData.get("type"),
     label: formData.get("label") || undefined,
-    url: formData.get("url"),
+    url: formData.get("url") || undefined,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
   }
-  const { type, url } = parsed.data;
+  const { type } = parsed.data;
+  const internal = isInternalButtonType(type);
+
+  if (!internal && !parsed.data.url?.trim()) {
+    return { error: "Le lien est requis." };
+  }
+  const url = internal ? "" : parsed.data.url!.trim();
 
   const label =
     parsed.data.label?.trim() ||
@@ -94,7 +101,7 @@ export async function addButtonAction(
 const updateButtonSchema = z.object({
   buttonId: z.string().min(1),
   label: z.string().min(1, "Le libellé est requis."),
-  url: z.string().min(1, "Le lien est requis."),
+  url: z.string().optional(),
 });
 
 export async function updateButtonAction(formData: FormData): Promise<void> {
@@ -102,7 +109,7 @@ export async function updateButtonAction(formData: FormData): Promise<void> {
   const parsed = updateButtonSchema.safeParse({
     buttonId: formData.get("buttonId"),
     label: formData.get("label"),
-    url: formData.get("url"),
+    url: formData.get("url") || undefined,
   });
   if (!parsed.success) return;
 
@@ -110,8 +117,9 @@ export async function updateButtonAction(formData: FormData): Promise<void> {
   const button = config.buttons.find((b) => b.id === parsed.data.buttonId);
   if (!button) return;
 
+  const internal = isInternalButtonType(button.type);
   button.label = parsed.data.label;
-  button.url = parsed.data.url;
+  button.url = internal ? "" : (parsed.data.url?.trim() ?? button.url);
   await saveDraft(merchant.id, config);
 }
 

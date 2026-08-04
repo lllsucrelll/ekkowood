@@ -68,6 +68,7 @@ model Merchant {
   resetTokens  PasswordResetToken[]
   visits       Visit[]
   buttonClicks ButtonClick[]
+  reports      Report[]
 }
 
 model MerchantSession {
@@ -116,6 +117,18 @@ model ButtonClick {
   buttonLabel String
   buttonType  String
   createdAt   DateTime @default(now())
+
+  @@index([merchantId, createdAt])
+}
+
+// --- Signalements (bouton "Signaler un problème") ---
+
+model Report {
+  id         String   @id @default(cuid())
+  merchant   Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  merchantId String
+  message    String
+  createdAt  DateTime @default(now())
 
   @@index([merchantId, createdAt])
 }
