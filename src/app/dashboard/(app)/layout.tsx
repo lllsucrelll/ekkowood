@@ -22,11 +22,7 @@ export default async function DashboardLayout({
             <Link href="/dashboard" className="hover:text-brand-primary">
               Configuration
             </Link>
-            <Link
-              href="/dashboard/preview"
-              target="_blank"
-              className="hover:text-brand-primary"
-            >
+            <Link href="/dashboard/preview" className="hover:text-brand-primary">
               Aperçu
             </Link>
             <Link href="/dashboard/stats" className="hover:text-brand-primary">
