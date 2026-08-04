@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { changeMerchantPasswordAction } from "@/lib/actions/merchant-settings";
 
 export function ChangePasswordForm() {
@@ -60,13 +61,21 @@ export function ChangePasswordForm() {
         <p className="text-sm text-brand-accent">{state.success}</p>
       )}
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-fit rounded-full bg-brand-primary px-5 py-2 text-sm font-medium text-white hover:bg-brand-primary-dark disabled:opacity-60"
-      >
-        {isPending ? "Enregistrement..." : "Changer le mot de passe"}
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-fit rounded-full bg-brand-primary px-5 py-2 text-sm font-medium text-white hover:bg-brand-primary-dark disabled:opacity-60"
+        >
+          {isPending ? "Enregistrement..." : "Changer le mot de passe"}
+        </button>
+        <Link
+          href="/dashboard/forgot-password"
+          className="text-sm text-brand-primary hover:underline"
+        >
+          Mot de passe oublié ?
+        </Link>
+      </div>
     </form>
   );
 }

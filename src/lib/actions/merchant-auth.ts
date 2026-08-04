@@ -15,12 +15,14 @@ import {
   RESET_LOGIN_STATE,
 } from "@/lib/auth/lockout";
 import { sendEmail } from "@/lib/email";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 export type ActionState = { error?: string; success?: string };
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
+  recaptchaToken: z.string().optional(),
 });
 
 export async function merchantLoginAction(
@@ -30,11 +32,17 @@ export async function merchantLoginAction(
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
+    recaptchaToken: formData.get("recaptchaToken") || undefined,
   });
   if (!parsed.success) {
     return { error: "Merci de renseigner un email et un mot de passe valides." };
   }
   const { email, password } = parsed.data;
+
+  const isHuman = await verifyRecaptcha(parsed.data.recaptchaToken ?? "");
+  if (!isHuman) {
+    return { error: "Échec de la vérification anti-spam. Merci de réessayer." };
+  }
 
   const merchant = await prisma.merchant.findUnique({ where: { email } });
 

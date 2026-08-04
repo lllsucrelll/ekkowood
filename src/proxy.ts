@@ -28,7 +28,9 @@ export function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith("/ivy")) {
-    const isAuthPage = pathname.startsWith("/ivy/login");
+    const isAuthPage =
+      pathname.startsWith("/ivy/login") ||
+      pathname.startsWith("/ivy/verify-2fa");
     const hasSession = request.cookies.has(ADMIN_SESSION_COOKIE);
 
     if (!isAuthPage && !hasSession) {

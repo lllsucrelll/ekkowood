@@ -18,11 +18,15 @@ model AdminUser {
   id               String    @id @default(cuid())
   email            String    @unique
   passwordHash     String
+  // Base32 TOTP secret; null until the admin has set up 2FA.
+  totpSecret       String?
+  totpEnabledAt    DateTime?
   failedLoginCount Int       @default(0)
   lockedUntil      DateTime?
   createdAt        DateTime  @default(now())
 
-  sessions AdminSession[]
+  sessions            AdminSession[]
+  twoFactorChallenges AdminTwoFactorChallenge[]
 }
 
 model AdminSession {
@@ -32,6 +36,21 @@ model AdminSession {
   adminUserId String
   expiresAt   DateTime
   createdAt   DateTime @default(now())
+
+  @@index([adminUserId])
+}
+
+// Short-lived record bridging "password verified" and "session created" for
+// admins with 2FA enabled — the real AdminSession is only created once the
+// TOTP code is verified.
+model AdminTwoFactorChallenge {
+  id             String    @id @default(cuid())
+  token          String    @unique
+  adminUser      AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  adminUserId    String
+  failedAttempts Int       @default(0)
+  expiresAt      DateTime
+  createdAt      DateTime  @default(now())
 
   @@index([adminUserId])
 }

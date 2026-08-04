@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getAdminSession } from "@/lib/auth/admin";
 import { adminLogoutAction } from "@/lib/actions/admin-auth";
 
@@ -21,14 +22,22 @@ export default async function BackofficeLayout({
           </p>
           <p className="text-xs text-brand-text/60">{admin.email}</p>
         </div>
-        <form action={adminLogoutAction}>
-          <button
-            type="submit"
+        <div className="flex items-center gap-4">
+          <Link
+            href="/ivy/settings"
             className="text-sm text-brand-text/60 hover:text-brand-primary"
           >
-            Se déconnecter
-          </button>
-        </form>
+            Paramètres
+          </Link>
+          <form action={adminLogoutAction}>
+            <button
+              type="submit"
+              className="text-sm text-brand-text/60 hover:text-brand-primary"
+            >
+              Se déconnecter
+            </button>
+          </form>
+        </div>
       </header>
       <main className="flex flex-1 flex-col p-6">{children}</main>
     </div>

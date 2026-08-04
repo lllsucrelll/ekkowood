@@ -105,3 +105,21 @@ export function getButtonHref(type: string, url: string): string {
   }
   return url;
 }
+
+const ALLOWED_URL_PROTOCOLS = new Set(["http:", "https:", "mailto:"]);
+
+/**
+ * Rejects unsafe schemes (javascript:, data:, vbscript:, ...) in
+ * merchant-supplied links, since these are rendered as raw <a href> on the
+ * public page and would otherwise run in every visitor's browser.
+ */
+export function isSafeButtonUrl(type: string, url: string): boolean {
+  if (isPredefinedButtonType(type) && PREDEFINED_BUTTON_TYPES[type].isPhone) {
+    return /^[\d\s()+.-]+$/.test(url);
+  }
+  try {
+    return ALLOWED_URL_PROTOCOLS.has(new URL(url).protocol);
+  } catch {
+    return false;
+  }
+}

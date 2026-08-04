@@ -1,5 +1,6 @@
 "use client";
 
+import { createElement } from "react";
 import { getButtonIcon } from "@/lib/button-types";
 
 export function PublicButton({
@@ -37,7 +38,9 @@ export function PublicButton({
       rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
       className="flex w-full items-center gap-3 rounded-full bg-white px-5 py-3.5 font-medium text-brand-text shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
-      <Icon className="h-5 w-5 shrink-0 text-brand-primary" />
+      {createElement(Icon, {
+        className: "h-5 w-5 shrink-0 text-brand-primary",
+      })}
       <span className="flex-1 text-center">{label}</span>
     </a>
   );

@@ -5,6 +5,7 @@ import {
   adminResetMerchantPasswordAction,
 } from "@/lib/actions/admin-merchants";
 import { CreateMerchantForm } from "./CreateMerchantForm";
+import { DeleteMerchantButton } from "./DeleteMerchantButton";
 
 function toDateInputValue(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -120,21 +121,27 @@ export default async function BackofficeHomePage() {
                         </form>
                       </td>
                       <td className="py-3 pr-4">
-                        <form
-                          action={toggleMerchantStatusAction.bind(
-                            null,
-                            merchant.id
-                          )}
-                        >
-                          <button
-                            type="submit"
-                            className="rounded-full border border-brand-primary px-3 py-1 text-xs font-medium text-brand-primary-dark hover:bg-brand-primary/10"
+                        <div className="flex items-center gap-3">
+                          <form
+                            action={toggleMerchantStatusAction.bind(
+                              null,
+                              merchant.id
+                            )}
                           >
-                            {merchant.status === "ACTIVE"
-                              ? "Suspendre"
-                              : "Réactiver"}
-                          </button>
-                        </form>
+                            <button
+                              type="submit"
+                              className="rounded-full border border-brand-primary px-3 py-1 text-xs font-medium text-brand-primary-dark hover:bg-brand-primary/10"
+                            >
+                              {merchant.status === "ACTIVE"
+                                ? "Suspendre"
+                                : "Réactiver"}
+                            </button>
+                          </form>
+                          <DeleteMerchantButton
+                            merchantId={merchant.id}
+                            businessName={merchant.businessName}
+                          />
+                        </div>
                       </td>
                     </tr>
                   );

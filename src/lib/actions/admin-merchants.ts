@@ -162,6 +162,31 @@ export async function adminResetMerchantPasswordAction(
   revalidatePath("/ivy");
 }
 
+const deleteMerchantSchema = z.object({
+  merchantId: z.string().min(1),
+});
+
+/**
+ * Permanently deletes a merchant and everything tied to it (sessions, reset
+ * tokens, visits, clicks, reports — all `onDelete: Cascade` in the schema).
+ * Unlike `toggleMerchantStatusAction`, this cannot be undone.
+ */
+export async function deleteMerchantAction(formData: FormData): Promise<void> {
+  const admin = await getAdminSession();
+  if (!admin) return;
+
+  const parsed = deleteMerchantSchema.safeParse({
+    merchantId: formData.get("merchantId"),
+  });
+  if (!parsed.success) return;
+
+  await prisma.merchant
+    .delete({ where: { id: parsed.data.merchantId } })
+    .catch(() => undefined);
+
+  revalidatePath("/ivy");
+}
+
 function isUniqueConstraintError(error: unknown, field: string): boolean {
   return (
     typeof error === "object" &&

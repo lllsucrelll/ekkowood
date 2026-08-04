@@ -6,12 +6,17 @@ import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getMerchantSession } from "@/lib/auth/merchant";
-import { uploadImage } from "@/lib/storage";
+import {
+  uploadImage,
+  UnsupportedImageError,
+  ImageTooLargeError,
+} from "@/lib/storage";
 import { parsePageConfig, sortedButtons, type PageConfig } from "@/lib/page-config";
 import {
   isPredefinedButtonType,
   getButtonDefaultLabel,
   isInternalButtonType,
+  isSafeButtonUrl,
 } from "@/lib/button-types";
 import type { ActionState } from "./merchant-auth";
 
@@ -39,11 +44,20 @@ export async function uploadBannerAction(
   if (!(file instanceof File) || file.size === 0) {
     return { error: "Merci de sélectionner une image." };
   }
-  if (!file.type.startsWith("image/")) {
-    return { error: "Le fichier doit être une image." };
+
+  let url: string;
+  try {
+    url = await uploadImage(file);
+  } catch (e) {
+    if (e instanceof ImageTooLargeError) {
+      return { error: "L'image ne doit pas dépasser 5 Mo." };
+    }
+    if (e instanceof UnsupportedImageError) {
+      return { error: "Format non supporté. Utilisez une image JPG, PNG, GIF ou WEBP." };
+    }
+    throw e;
   }
 
-  const url = await uploadImage(file);
   const config = parsePageConfig(merchant.draftConfig);
   config.banner = url;
   await saveDraft(merchant.id, config);
@@ -77,6 +91,10 @@ export async function addButtonAction(
     return { error: "Le lien est requis." };
   }
   const url = internal ? "" : parsed.data.url!.trim();
+
+  if (!internal && !isSafeButtonUrl(type, url)) {
+    return { error: "Lien invalide." };
+  }
 
   const label =
     parsed.data.label?.trim() ||
@@ -118,8 +136,11 @@ export async function updateButtonAction(formData: FormData): Promise<void> {
   if (!button) return;
 
   const internal = isInternalButtonType(button.type);
+  const newUrl = parsed.data.url?.trim();
+  if (!internal && newUrl && !isSafeButtonUrl(button.type, newUrl)) return;
+
   button.label = parsed.data.label;
-  button.url = internal ? "" : (parsed.data.url?.trim() ?? button.url);
+  button.url = internal ? "" : (newUrl ?? button.url);
   await saveDraft(merchant.id, config);
 }
 
