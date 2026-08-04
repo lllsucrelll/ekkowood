@@ -15,10 +15,10 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between border-b border-black/10 bg-white px-6 py-4">
+      <header className="flex flex-col gap-3 border-b border-black/10 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
           <p className="text-sm text-brand-text/60">{merchant.businessName}</p>
-          <nav className="mt-1 flex gap-4 text-sm font-medium">
+          <nav className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium">
             <Link href="/dashboard" className="hover:text-brand-primary">
               Configuration
             </Link>
@@ -42,7 +42,7 @@ export default async function DashboardLayout({
           </button>
         </form>
       </header>
-      <main className="flex flex-1 flex-col p-6">{children}</main>
+      <main className="flex flex-1 flex-col p-4 sm:p-6">{children}</main>
     </div>
   );
 }
