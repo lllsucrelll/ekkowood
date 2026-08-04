@@ -9,7 +9,11 @@ import type { ActionState } from "./merchant-auth";
 
 const submitReportSchema = z.object({
   merchantId: z.string().min(1),
-  message: z.string().trim().min(1, "Merci de décrire le problème.").max(2000),
+  message: z
+    .string()
+    .trim()
+    .min(1, "Merci de décrire le problème.")
+    .max(250, "250 caractères maximum."),
 });
 
 export async function submitReportAction(
