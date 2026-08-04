@@ -1,20 +1,45 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { submitReportAction } from "@/lib/actions/reports";
+import type { ActionState } from "@/lib/actions/merchant-auth";
+import { getRecaptchaToken } from "@/lib/recaptcha-loader";
 
 const MAX_LENGTH = 250;
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
 export function ReportForm({ merchantId }: { merchantId: string }) {
-  const [state, formAction, isPending] = useActionState(submitReportAction, {});
   const [message, setMessage] = useState("");
+  const [state, setState] = useState<ActionState>({});
+  const [isPending, setIsPending] = useState(false);
 
   if (state.success) {
     return <p className="text-center text-brand-accent">{state.success}</p>;
   }
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsPending(true);
+    setState({});
+
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      if (RECAPTCHA_SITE_KEY) {
+        const token = await getRecaptchaToken(RECAPTCHA_SITE_KEY, "report");
+        formData.set("recaptchaToken", token);
+      }
+      const result = await submitReportAction({}, formData);
+      setState(result);
+    } catch {
+      setState({ error: "Une erreur est survenue. Merci de réessayer." });
+    } finally {
+      setIsPending(false);
+    }
+  }
+
   return (
-    <form action={formAction} className="flex w-full flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
       <input type="hidden" name="merchantId" value={merchantId} />
       <textarea
         name="message"
