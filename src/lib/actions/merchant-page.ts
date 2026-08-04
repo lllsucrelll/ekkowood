@@ -146,26 +146,35 @@ const updateButtonSchema = z.object({
   url: z.string().optional(),
 });
 
-export async function updateButtonAction(formData: FormData): Promise<void> {
+export async function updateButtonAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const merchant = await requireMerchant();
   const parsed = updateButtonSchema.safeParse({
     buttonId: formData.get("buttonId"),
     label: formData.get("label"),
     url: formData.get("url") || undefined,
   });
-  if (!parsed.success) return;
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
+  }
 
   const config = parsePageConfig(merchant.draftConfig);
   const button = config.buttons.find((b) => b.id === parsed.data.buttonId);
-  if (!button) return;
+  if (!button) return { error: "Bouton introuvable." };
 
   const internal = isInternalButtonType(button.type);
   const newUrl = parsed.data.url?.trim();
-  if (!internal && newUrl && !isSafeButtonUrl(button.type, newUrl)) return;
+  if (!internal && newUrl && !isSafeButtonUrl(button.type, newUrl)) {
+    return { error: "Lien invalide." };
+  }
 
   button.label = parsed.data.label;
   button.url = internal ? "" : (newUrl ?? button.url);
   await saveDraft(merchant.id, config);
+
+  return { success: "Bouton mis à jour." };
 }
 
 export async function deleteButtonAction(buttonId: string): Promise<void> {
