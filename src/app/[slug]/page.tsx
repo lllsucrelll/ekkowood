@@ -33,7 +33,14 @@ export default async function PublicMerchantPage({
   const config = parsePageConfig(merchant.publishedConfig);
 
   return (
-    <main className="flex flex-1 justify-center p-4 sm:p-8">
+    <main
+      className="flex flex-1 justify-center p-4 sm:p-8"
+      style={
+        config.backgroundColor
+          ? { backgroundColor: config.backgroundColor }
+          : undefined
+      }
+    >
       <MerchantPageContent
         merchantId={merchant.id}
         businessName={merchant.businessName}

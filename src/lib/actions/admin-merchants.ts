@@ -11,7 +11,7 @@ import { slugify } from "@/lib/slug";
 import { sendEmail } from "@/lib/email";
 import type { ActionState } from "./merchant-auth";
 
-const DEFAULT_DRAFT_CONFIG = { banner: null, buttons: [] };
+const DEFAULT_DRAFT_CONFIG = { banner: null, backgroundColor: null, buttons: [] };
 
 const createMerchantSchema = z.object({
   businessName: z.string().min(1, "Le nom du commerce est requis."),

@@ -65,6 +65,30 @@ export async function uploadBannerAction(
   return { success: "Bannière mise à jour (brouillon)." };
 }
 
+const updateBackgroundColorSchema = z.object({
+  backgroundColor: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .nullable(),
+});
+
+export async function updateBackgroundColorAction(
+  formData: FormData
+): Promise<void> {
+  const merchant = await requireMerchant();
+  const raw = formData.get("backgroundColor");
+  const value = typeof raw === "string" && raw.trim() ? raw.trim() : null;
+
+  const parsed = updateBackgroundColorSchema.safeParse({
+    backgroundColor: value,
+  });
+  if (!parsed.success) return;
+
+  const config = parsePageConfig(merchant.draftConfig);
+  config.backgroundColor = parsed.data.backgroundColor;
+  await saveDraft(merchant.id, config);
+}
+
 const addButtonSchema = z.object({
   type: z.string().min(1),
   label: z.string().optional(),

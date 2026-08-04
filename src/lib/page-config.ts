@@ -10,13 +10,23 @@ export const pageButtonSchema = z.object({
 
 export const pageConfigSchema = z.object({
   banner: z.string().nullable(),
+  // Custom page background; null means "use the default brand background".
+  backgroundColor: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .nullable()
+    .default(null),
   buttons: z.array(pageButtonSchema),
 });
 
 export type PageButton = z.infer<typeof pageButtonSchema>;
 export type PageConfig = z.infer<typeof pageConfigSchema>;
 
-export const EMPTY_PAGE_CONFIG: PageConfig = { banner: null, buttons: [] };
+export const EMPTY_PAGE_CONFIG: PageConfig = {
+  banner: null,
+  backgroundColor: null,
+  buttons: [],
+};
 
 /** Parses a Prisma Json value into a PageConfig, tolerating null/malformed data. */
 export function parsePageConfig(value: unknown): PageConfig {

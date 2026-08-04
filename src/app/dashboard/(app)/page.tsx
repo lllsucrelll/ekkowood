@@ -9,6 +9,7 @@ import {
 } from "@/lib/actions/merchant-page";
 import { BannerUploader } from "./BannerUploader";
 import { AddButtonForm } from "./AddButtonForm";
+import { BackgroundColorPicker } from "./BackgroundColorPicker";
 
 export default async function DashboardConfigPage() {
   const merchant = await getMerchantSession();
@@ -25,6 +26,11 @@ export default async function DashboardConfigPage() {
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold">Bannière</h2>
         <BannerUploader currentBanner={draft.banner} />
+      </section>
+
+      <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-lg font-semibold">Couleur de fond</h2>
+        <BackgroundColorPicker currentColor={draft.backgroundColor} />
       </section>
 
       <section className="rounded-2xl bg-white p-6 shadow-sm">
