@@ -14,7 +14,7 @@ export default async function MerchantLoginPage() {
     <main className="flex flex-1 flex-col items-center justify-center p-8">
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm">
         <h1 className="mb-6 text-xl font-semibold text-brand-primary-dark">
-          Espace commerçant
+          Mon espace Ekko Wood
         </h1>
         <LoginForm
           action={merchantLoginAction}
