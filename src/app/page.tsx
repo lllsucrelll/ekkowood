@@ -5,10 +5,10 @@ export default function Home() {
     <main className="flex flex-1 flex-col items-center justify-center gap-8 p-8 text-center">
       <div>
         <h1 className="text-3xl font-semibold text-brand-primary-dark">
-          Ekko Wood
+          Bienvenue sur votre espace Ekko Wood
         </h1>
         <p className="mt-2 text-brand-text/70">
-          Plateforme de pages de renvoi pour les présentoirs Ekko Wood.
+          Gérez l&apos;interface digitale de vos présentoirs connectés.
         </p>
       </div>
       <div className="flex gap-4">
@@ -16,7 +16,7 @@ export default function Home() {
           href="/dashboard/login"
           className="rounded-full bg-brand-primary px-6 py-3 text-white transition hover:bg-brand-primary-dark"
         >
-          Espace commerçant
+          Accéder à mon espace
         </Link>
       </div>
     </main>
